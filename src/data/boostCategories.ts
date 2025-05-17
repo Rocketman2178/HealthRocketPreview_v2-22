@@ -6,7 +6,7 @@ import { nutritionBoosts } from './boosts/nutritionBoosts';
 import { biohackingBoosts } from './boosts/biohackingBoosts';
 import type { BoostCategory } from '../types/dashboard';
 
-// Export all boosts for calculations
+// EXPORT ALL BOOSTS FOR CALCULATION
 export const allBoosts = [
   ...mindsetBoosts,
   ...sleepBoosts,
