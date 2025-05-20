@@ -1,29 +1,29 @@
-import { supabase } from './client';
-import { AuthError } from '../errors';
+import { supabase } from "./client";
+import { AuthError } from "../errors";
 
 export async function resetPassword(email: string) {
   try {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: `${window.location.origin}/reset-password`,
     });
-    
+
     if (error) throw error;
   } catch (err) {
-    console.error('Password reset error:', err);
-    throw new AuthError('Failed to send reset email', err);
+    console.error("Password reset error:", err);
+    throw new AuthError("Failed to send reset email", err);
   }
 }
 
-export async function updatePassword(token: string, newPassword: string) {
+export async function updatePassword(newPassword: string) {
   try {
     const { error } = await supabase.auth.updateUser({
-      password: newPassword
+      password: newPassword,
     });
 
     if (error) throw error;
   } catch (err) {
-    console.error('Password update error:', err);
-    throw new AuthError('Failed to update password', err);
+    console.error("Password update error:", err);
+    throw new AuthError("Failed to update password", err);
   }
 }
 
@@ -31,18 +31,18 @@ export async function signIn(email: string, password: string) {
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
-    
+
     if (error) {
-      if (error.message.includes('Invalid login')) {
-        throw new AuthError('Invalid email or password');
+      if (error.message.includes("Invalid login")) {
+        throw new AuthError("Invalid email or password");
       }
       throw error;
     }
   } catch (err) {
-    console.error('Sign in error:', err);
-    throw new AuthError('Failed to sign in', err);
+    console.error("Sign in error:", err);
+    throw new AuthError("Failed to sign in", err);
   }
 }
 
@@ -53,35 +53,32 @@ export async function signUp(email: string, password: string, name: string) {
       email,
       password,
       options: {
-        data: { name }
-      }
+        data: { name },
+      },
     });
 
     if (signUpError) throw signUpError;
-    if (!data.user) throw new Error('No user returned from signup');
+    if (!data.user) throw new Error("No user returned from signup");
 
     // Create user profile
-    const { error: profileError } = await supabase
-      .from('users')
-      .insert({
-        id: data.user.id,
-        email,
-        name,
-        plan: 'Pro Plan', // Default to Pro Plan with trial
-        subscription_start_date: new Date().toISOString(), // Track when subscription started for trial period
-        level: 1,
-        fuel_points: 0,
-        burn_streak: 0,
-        health_score: 7.8,
-        healthspan_years: 0,
-        onboarding_completed: false
-      });
+    const { error: profileError } = await supabase.from("users").insert({
+      id: data.user.id,
+      email,
+      name,
+      plan: "Pro Plan", // Default to Pro Plan with trial
+      subscription_start_date: new Date().toISOString(), // Track when subscription started for trial period
+      level: 1,
+      fuel_points: 0,
+      burn_streak: 0,
+      health_score: 7.8,
+      healthspan_years: 0,
+      onboarding_completed: false,
+    });
 
     if (profileError) throw profileError;
-
   } catch (err) {
-    console.error('Sign up error:', err);
-    throw new AuthError('Failed to create account', err);
+    console.error("Sign up error:", err);
+    throw new AuthError("Failed to create account", err);
   }
 }
 

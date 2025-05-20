@@ -5,12 +5,14 @@ import { ChatPage } from './components/chat/ChatPage';
 import { VitalResponsePage } from './components/common/VitalResponePage';
 import { DeviceConnection } from './components/health/DeviceConnection';
 import { SubscriptionSuccess } from './components/subscription/SubscriptionSuccess';
+import { PasswordUpdateForm } from './components/auth/PasswordUpdateForm';
 
 export function AppRoutes() {
   return (
     <>
       <Routes>
         <Route path="/" element={<CoreDashboard />} />
+        <Route path='/reset-password' element={<PasswordUpdateForm/>}/>
         <Route path="/challenge/:challengeId" element={<ChallengePage />} />
         <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path='/connect-device' element={<DeviceConnection/>}/>
