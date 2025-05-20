@@ -63,7 +63,7 @@ export function DailyBoosts({
             <div className="flex flex-col gap-1">
               <div className="text-sm">
                 <span className="text-gray-400">Daily Boosts Available:</span>
-                <span className="text-orange-500 ml-1">{todayStats.boostsRemaining}/{maxDailyBoosts}</span>
+                <span className="text-orange-500 ml-1">{availableBoosts}/{maxDailyBoosts}</span>
               </div>
               <div className="text-sm text-gray-400">FP Earned Today: <span className="text-orange-500">+{todayStats.fpEarned}</span></div>
             </div>

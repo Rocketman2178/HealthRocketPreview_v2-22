@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Rocket, ArrowLeft } from 'lucide-react';
-import { Logo } from '../ui/logo';
 import { useSupabase } from '../../contexts/SupabaseContext';
 
 interface PasswordResetFormProps {

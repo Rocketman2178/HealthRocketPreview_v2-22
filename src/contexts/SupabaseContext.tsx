@@ -12,7 +12,7 @@ interface SupabaseContextType {
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-  updatePassword: (token: string, newPassword: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 }
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);
@@ -141,7 +141,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signOut,
     resetPassword,
-    updatePassword
+    updatePassword,
   };
 
   return (

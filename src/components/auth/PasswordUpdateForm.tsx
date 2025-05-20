@@ -1,40 +1,38 @@
-import React, { useState } from 'react';
-import { Rocket, ArrowLeft } from 'lucide-react';
-import { Logo } from '../ui/logo';
-import { useSupabase } from '../../contexts/SupabaseContext';
+import React, { useState } from "react";
+import { Rocket } from "lucide-react";
+import { useSupabase } from "../../contexts/SupabaseContext";
+import { useNavigate } from "react-router-dom";
 
-interface PasswordUpdateFormProps {
-  token: string;
-  onBack: () => void;
-}
-
-export function PasswordUpdateForm({ token, onBack }: PasswordUpdateFormProps) {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+export function PasswordUpdateForm() {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const { updatePassword } = useSupabase();
-
+  const navitate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match');
+      setMessage("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      setMessage('Password must be at least 6 characters');
+      setMessage("Password must be at least 6 characters");
       return;
     }
 
     try {
       setLoading(true);
       setMessage(null);
-      await updatePassword(token, password);
-      setMessage('Password updated successfully. You can now login.');
+      await updatePassword(password);
+      setMessage("Password updated successfully. You can now login.");
+      navitate("/");
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Failed to update password');
+      setMessage(
+        err instanceof Error ? err.message : "Failed to update password"
+      );
     } finally {
       setLoading(false);
     }
@@ -51,9 +49,7 @@ export function PasswordUpdateForm({ token, onBack }: PasswordUpdateFormProps) {
       <h2 className="text-2xl font-bold text-white text-center mb-2">
         Update Password
       </h2>
-      <p className="text-gray-400 text-center mb-6">
-        Enter your new password
-      </p>
+      <p className="text-gray-400 text-center mb-6">Enter your new password</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -81,9 +77,13 @@ export function PasswordUpdateForm({ token, onBack }: PasswordUpdateFormProps) {
         </div>
 
         {message && (
-          <div className={`text-sm text-center ${
-            message.includes('successfully') ? 'text-green-400' : 'text-red-400'
-          }`}>
+          <div
+            className={`text-sm text-center ${
+              message.includes("successfully")
+                ? "text-green-400"
+                : "text-red-400"
+            }`}
+          >
             {message}
           </div>
         )}
@@ -94,16 +94,7 @@ export function PasswordUpdateForm({ token, onBack }: PasswordUpdateFormProps) {
             disabled={loading}
             className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Updating...' : 'Update Password'}
-          </button>
-          
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center justify-center gap-2 text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Login</span>
+            {loading ? "Updating..." : "Update Password"}
           </button>
         </div>
       </form>
