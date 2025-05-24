@@ -2,34 +2,18 @@ import { useState, useEffect } from "react";
 import {
   X,
   Shield,
-  Users,
-  Building2,
-  Rocket,
   Gift,
   CreditCard,
 } from "lucide-react";
-import StripeCheckout from "../stripe/StripeCheckout";
 import { SubscriptionSuccess } from "../subscription/SubscriptionSuccess";
 import { BillingPortal } from "../subscription/BillingPortal";
 import { useStripe } from "../../hooks/useStripe";
 import type { User } from "../../types/user";
 import { DowngradeConfirmation } from "../subscription/DowngradeConfirmation";
-
-interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  interval: string;
-  features: string[];
-  price_id: string;
-  is_active: boolean;
-  icon: React.ComponentType<any>;
-  comingSoon: boolean;
-  trialDays?: number;
-  promoCode?: boolean;
-}
-
+import { supabase } from "../../lib/supabase/client";
+import Plan from "../../types/plan";
+import { plans } from "../../constants";
+import StripeCheckoutModal from "../stripe/StripeCheckout";
 interface SubscriptionManagerProps {
   onClose: () => void;
   userData: User | null;
@@ -40,7 +24,6 @@ export function SubscriptionManager({
   userData,
 }: SubscriptionManagerProps) {
   const [activeTab, setActiveTab] = useState<"plans" | "billing">("plans");
-  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [paymentModal, setPaymentModal] = useState<boolean>(false);
@@ -50,85 +33,6 @@ export function SubscriptionManager({
   const [isPaidSubscription, setIsPaidSubscription] = useState<boolean>(false); 
   const [showDowngradeConfirmation, setShowDowngradeConfirmation] = useState<boolean>(false);
   const [planToDowngradeTo, setPlanToDowngradeTo] = useState<Plan | null>(null);
-
-  const plans: Plan[] = [
-    {
-      id: "free_plan",
-      name: "Free Plan",
-      description: "Basic access to Health Rocket",
-      price: 0,
-      interval: "month",
-      features: [
-        "Access to all basic features",
-        "Daily boosts and challenges",
-        "Health tracking",
-        "Community access",
-        "Prize Pool Rewards not included",
-      ],
-      price_id: "price_free",
-      is_active: true,
-      icon: Rocket,
-      comingSoon: false,
-    },
-    {
-      id: "pro_plan",
-      name: "Pro Plan",
-      description: "Full access to all features",
-      price: 59.95,
-      interval: "month",
-      features: [
-        "All Free Plan features",
-        "Premium challenges and quests",
-        "Prize pool eligibility",
-        "Advanced health analytics",
-        "60-day free trial",
-      ],
-      price_id: "price_1Qt7jVHPnFqUVCZdutw3mSWN",
-      is_active: true,
-      icon: Shield,
-      comingSoon: false,
-    },
-    {
-      id: "family_plan",
-      name: "Pro + Family",
-      description: "Share with up to 5 family members",
-      price: 89.95,
-      interval: "month",
-      features: [
-        "All Pro Plan features",
-        "Up to 5 family members",
-        "Family challenges and competitions",
-        "Family leaderboard",
-        "Shared progress tracking",
-      ],
-      price_id: "price_1Qt7lXHPnFqUVCZdlpS1vrfs",
-      is_active: true,
-      icon: Users,
-      comingSoon: true,
-    },
-    {
-      id: "team_plan",
-      name: "Pro + Team",
-      description: "For teams and organizations",
-      price: 149.95,
-      interval: "month",
-      features: [
-        "All Pro Plan features",
-        "Up to 20 team members",
-        "Team challenges and competitions",
-        "Team analytics dashboard",
-        "Admin controls and reporting",
-      ],
-      price_id: "price_1Qt7mVHPnFqUVCZdqvWROuTD",
-      is_active: true,
-      icon: Building2,
-      comingSoon: true,
-    },
-  ];
-
-  // Get current plan name
-  const currentPlanName = userData?.plan || "Free Plan";
-
   // Calculate days left in trial
   useEffect(() => {
     if (!userData?.subscription_start_date) return;
@@ -188,16 +92,15 @@ export function SubscriptionManager({
         plan.trialDays || 0,
         plan.promoCode || false
       );
-
-      if ("error" in result) {
-        console.error("Error creating subscription:", result.error);
-        // Fall back to payment modal
-        setSelectedPlan(plan);
-        setPaymentModal(true);
-      } else {
         // Redirect to Stripe checkout
-        window.location.href = result.sessionUrl;
-      }
+        if (result?.sessionUrl) {
+          window.location.href = result.sessionUrl;
+          // Fall back to payment modal
+          setSelectedPlan(plan);
+          setPaymentModal(true);
+        } else {
+          throw new Error('No session URL returned');
+        }
     } catch (err) {
       console.error("Error handling plan selection:", err);
       // Fall back to payment modal
@@ -208,8 +111,7 @@ export function SubscriptionManager({
     }
   };
 
-  const handleDowngradeConfirmed = () => {
-    async function processDowngrade() {
+  const handleDowngradeConfirmed = async() => {
       try {
         setLoading(true);
         
@@ -239,9 +141,6 @@ export function SubscriptionManager({
         setLoading(false);
       }
     }
-    
-    processDowngrade();
-  };
 
   return (
     <div className="w-full max-w-4xl bg-gray-800 rounded-lg my-8 max-h-[90vh] overflow-y-auto relative z-[201]">
@@ -537,11 +436,9 @@ export function SubscriptionManager({
             className="absolute inset-0 bg-black/80 backdrop-blur-sm z-[301]"
             onClick={() => setPaymentModal(false)}
           ></div>
-          <StripeCheckout
-            priceId={selectedPlan.price_id}
+          <StripeCheckoutModal
             trialDays={selectedPlan.trialDays || 0}
-            promoCode={!!selectedPlan.promoCode || false}
-            onClose={() => setPaymentModal(false)}
+            onClose={setPaymentModal}
           />
         </div>
       )}

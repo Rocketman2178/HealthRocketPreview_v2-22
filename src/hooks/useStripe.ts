@@ -43,9 +43,6 @@ export function useStripe() {
       );
 
       const data = await response.json();
-
-      console.log("Stripe session response:", data);
-
       if (!response.ok || data.error) {
         throw new Error(data.error || "Failed to create Stripe session");
       }
@@ -56,7 +53,6 @@ export function useStripe() {
       };
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create subscription');
       return { error: err instanceof Error ? err.message : 'Failed to create subscription' };
     } finally {
       setLoading(false);

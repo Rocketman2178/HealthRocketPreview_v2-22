@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { Check, X, Rocket, Trophy, Gift } from 'lucide-react';
 import { useSupabase } from '../../contexts/SupabaseContext';
 import { supabase } from '../../lib/supabase';
 
 interface SubscriptionSuccessProps {
-  onClose: () => void;
+   onClose: Dispatch<SetStateAction<boolean>>;
   trialDays?: number;
 }
 
@@ -92,7 +92,7 @@ export function SubscriptionSuccess({ onClose, trialDays = 0 }: SubscriptionSucc
               )}
             </div>
             <button
-              onClick={onClose}
+              onClick={()=>onClose(false)}
               className="text-gray-400 hover:text-white transition-colors"
             >
               <X size={24} />
@@ -159,7 +159,7 @@ export function SubscriptionSuccess({ onClose, trialDays = 0 }: SubscriptionSucc
 
           {/* Continue Button */}
           <button
-            onClick={onClose}
+            onClick={()=>onClose(false)}
             className="w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
           >
             Continue to Game

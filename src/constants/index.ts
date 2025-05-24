@@ -1,2 +1,3 @@
 import supportedProviders from "./supportedProvidersList";
-export {supportedProviders};
+import plans from "./subscriptionPlans";
+export {supportedProviders,plans};
