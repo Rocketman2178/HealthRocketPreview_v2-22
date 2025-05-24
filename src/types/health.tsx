@@ -1,4 +1,4 @@
-import { DivideIcon as LucideIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 export type Gender = 'Male' | 'Female' | 'Prefer Not To Say';
 
@@ -16,7 +16,6 @@ export interface HealthCategory {
 export interface HealthAssessment {
   id: string;
   user_id: string;
-  created_at: string;
   created_at: string;
   expected_lifespan: number;
   expected_healthspan: number;

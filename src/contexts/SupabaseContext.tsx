@@ -131,7 +131,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(reconnectTimer);
       }
     };
-  }, [isConnected]); // Remove retryCount from dependencies since we're using retryCountRef
+  }, [isConnected]); 
 
   const value = {
     user,
